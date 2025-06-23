@@ -1,355 +1,55 @@
-# -Unsupervised-Learning--Bank-Customer-Segmentation-using-KMeans-Clustering
+# # Bank-Customer-Segementation-Using-Unsupervised-Learning
 
+## Problem Statement
 
-Bank_Customer_Segmentation.ipynb
-Bank_Customer_Segmentation.ipynb_
-Bank Churn Customer Analysis: Customer Segmentation
-|| Segmenting Bank Customers and Recommend Potential New Products or Services for each Segment ||
+The problem statement is to develop a customer segmentation, i.e. to identify different groups of customers with similar spending behaviour, to define a marketing strategy for the bank. By understanding customers, companies can launch targeted marketing campaigns that are tailored to the specific needs of the customer.
 
-Objective 1: Preparing the Data for Modeling
-Our First Objective is to Prepare the Data for Modeling by Selecting a Subset of Fields, making sure they are Numeric, looking at their Distributions, and Engineering a new feature.
+## Dataset
 
+The dataset used for this project can be found at this [link](https://www.kaggle.com/arjunbhasin2013/ccdata).
 
-[ ]
-# Importing the Required Libraries
-import pandas as pd
-import numpy as np
+## Data Cleaning Process
 
-import matplotlib.pyplot as plt
-import seaborn as sns
+- The dataset has 1 missing value for CREDIT_LIMIT and 313 missing values for MINIMUM_PAYMENTS.
+- We perform imputation by replacing the missing values in CREDIT_LIMIT with the median value and replacing the missing values in MINIMUM_PAYMENTS with the mean value.
 
-[ ]
-# First, make sure your Google Drive is mounted in Colab:
-# from google.colab import drive
-# drive.mount('/content/drive')
-Mounted at /content/drive
+## Data Preprocessing
 
-[ ]
-# churn_cust_info = pd.read_excel("Bank_Churn_Messy.xlsx")
-# data = pd.read_csv("/content/drive/MyDrive/Data Analytics & BI Career Path/Batch 2/Python/Bank Churn Customer Project/Bank_Churn.csv")
-data = pd.read_csv("Bank_Churn.csv")
-data.head()
+- **Handling Skewness**: We observe that our data is pretty skewed. Skewness is a measure of symmetry. To be exact, it is a measure of lack of symmetry. This means that the larger the number is the more your data lack symmetry (not normal, that is). We use the **square root method** to reduce the skewness in the data. The square root method is typically used when your data is moderately skewed. Now using the square root (e.g., sqrt(x)) is  a transformation that has a moderate effect on distribution shape.
+- **Scaling**: Data is scaled using `StandardScaler()`.
 
+## Diminensionality Reduction
 
-[ ]
-data.info()
-<class 'pandas.core.frame.DataFrame'>
-RangeIndex: 10000 entries, 0 to 9999
-Data columns (total 13 columns):
- #   Column           Non-Null Count  Dtype  
----  ------           --------------  -----  
- 0   CustomerId       10000 non-null  int64  
- 1   Surname          10000 non-null  object 
- 2   CreditScore      10000 non-null  int64  
- 3   Geography        10000 non-null  object 
- 4   Gender           10000 non-null  object 
- 5   Age              10000 non-null  int64  
- 6   Tenure           10000 non-null  int64  
- 7   Balance          10000 non-null  float64
- 8   NumOfProducts    10000 non-null  int64  
- 9   HasCrCard        10000 non-null  int64  
- 10  IsActiveMember   10000 non-null  int64  
- 11  EstimatedSalary  10000 non-null  float64
- 12  Exited           10000 non-null  int64  
-dtypes: float64(2), int64(8), object(3)
-memory usage: 1015.8+ KB
-Let's keep a subset of the Data
-Create a DataFrame containing all fields except "CustomerId", "Surname" and "Exited".
+In this problem, there are many factors on the basis of which the final clustering will be done. These factors are basically attributes or features. The higher the number of features, the harder it is to work with them. Many of these features are correlated, and are hence redundant. This is why we will be performing dimensionality reduction on the selected features.
 
+For this we use **Principal Component Analysis**. PCA is an unsupervised machine learning algorithm that performs dimensionality reduction while attempting to keep the original information unchanged. PCA works by trying to find a new set of features called components. These components are composites of the uncorrelated given input features.
 
-[ ]
-data_subset = data [['CreditScore', 'Geography', 'Gender',
-                     'Age', 'Tenure', 'Balance', 'NumOfProducts',
-                     'HasCrCard', 'IsActiveMember', 'EstimatedSalary']]
+## Clustering
 
-data_subset.head()
+- We use the **K-Means Clustering algorithm** to find the clusters for the group of customers. K-Means Clustering is an unsupervised machine learning algorithm that works by grouping some data points together in an unsupervised fashion. The algorithm groups observations with similar attribute values together by measuring the Euclidean distance between points. Here 'K' is the number of clusters.
+- We need to determine the optimal value of 'K' first. For this we use the elbow method. The elbow method is a heuristic method of interpretation and validation of consistency within cluster analysis designed to help find the appropriate number of clusters in a dataset. If the line chart looks like an arm, then the "elbow" on the arm is the value of k 
+that is the best. **We find that our optimal K value is 6.** The result for it is shown below.
 
-Making Text Fields Numeric
+![Screenshot (5)](https://user-images.githubusercontent.com/41315903/150700616-ea935011-3e47-40dd-9580-189f0c251bed.png)
 
-[ ]
-data_clean = data_subset.copy()
-data_clean.head()
+## Inference
 
+Since this is an unsupervised clustering. We do not have a tagged feature to evaluate or score our model. The purpose is to study the patterns in the clusters formed and determine the nature of the clusters' patterns.
+![K-Means Cluster](https://user-images.githubusercontent.com/41315903/150701243-89099d5e-ad7e-41cb-bdb9-12beb857cb91.png)
 
-[ ]
-data_clean.Geography.value_counts()
+The following is the distribution of our clusters:
+![Distribution of Cluster](https://user-images.githubusercontent.com/41315903/150701794-45f8997d-9bba-4afe-973e-94e7891d8a1e.png)
 
+## Customer Profiling
+Inference from the clusters
+Cluster 0: Smallest Spenders and Lowest Credit Limit - this is the group with the lowest credit limit but they don't appear to buy much. Unfortunately this appears to be the largest group of customers.
 
-[ ]
-data_clean.Gender.value_counts()
+Cluster 1: Medium Spenders with third highest Payments - the second highest Purchases group (after the Big Spenders).
 
+Cluster 2: Big Spenders with large Payments - they make expensive purchases and have a credit limit that is between average and high. This is only a small group of customers.
 
-[ ]
-data_clean.Gender = np.where(data_clean.Gender == 'Female', 1, 0)
-data_clean.head()
+Cluster 3: Cash Advances with Small Payments - this group likes taking cash advances, but make only small payments.
 
+Cluster 4: Small Spenders and Low Credit Limit - they have the smallest Balances after the Smallest Spenders, their Credit Limit is in the bottom 3 groups
 
-[ ]
-data_clean = pd.get_dummies(data_clean, columns = ['Geography'], dtype = 'int', prefix = '', prefix_sep = '')
-data_clean.head()
-
-Exploring the Data
-Exploring the Data by looking at the Min/Max values and the Distribution of each Column.
-
-
-[ ]
-data_clean.describe().round()
-
-
-[ ]
-sns.pairplot(data_clean, corner = True);
-
-Let's Engineer a New Feature
-Engineer a new feature called "ProductsPerYear".
-
-
-[ ]
-data_clean['ProductsPerYear'] = np.where(data_clean.Tenure == 0, data_clean.NumOfProducts, data_clean.NumOfProducts / data_clean.Tenure)
-data_clean.head()
-
-
-[ ]
-data_clean.describe().round()
-
-Objective 2: Cluster the Customers (Round 1)
-Our Second Objective is to Segment the Customers using K-Means Clustering, including Standardizing the Data, Creating an Inertia Plot, and Interpreting the Clusters.
-
-Scale the Data using Stardardization
-Standardize the data so that each column has a Mean of 0 and Standard Deviation of 1.
-
-
-[ ]
-from sklearn.preprocessing import StandardScaler
-
-scaler = StandardScaler()
-df_scaled = pd.DataFrame(scaler.fit_transform(data_clean), columns = data_clean.columns)
-df_scaled.head()
-
-
-[ ]
-df_scaled.describe().round()
-
-Fit K-Means Models with 2-15 Clusters
-Fit K-Means Clustering Models on the Standardized Data with 2-15 Clusters to create an Inertia Plot.
-
-
-[ ]
-# Import kmeans and write a loop to fit models with 2 to 15 clusters
-from sklearn.cluster import KMeans
-from sklearn.metrics import silhouette_score
-
-# Create an empty list to hold many Inertia and Silhouette Values
-inertia_values = []
-silhouette_scores = []
-
-# Creat 2-15 clusters, and add the Intertia Scores and Silhouette Scores to the Lists
-
-for k in range(2, 16):
-  kmeans = KMeans(n_clusters = k, n_init= 10, random_state = 42) #changed from auto to 10
-  kmeans.fit(df_scaled)
-  inertia_values.append(kmeans.inertia_)
-  silhouette_scores.append(silhouette_score(df_scaled, kmeans.labels_, metric= 'euclidean', sample_size= None))
-
-[ ]
-## Plot the Inertia Plot
-# Turn the List into a Series of Plotting
-inertia_series = pd.Series(inertia_values, index = range(2, 16))
-
-# Plot the Data
-inertia_series.plot(marker= 'o')
-plt.xlabel('Number of Clusters (k)')
-plt.ylabel('Inertia')
-plt.title('Number of Clusters vs. Inertia')
-plt.show()
-
-So, looking at this we need to find the Elbow of this Inertia Plot.
-
-The Inertia drops significantly at K=5. So, we choose k=5 for our KMeans Clustering.
-
-Plot the Intertia Values and Find the Elbow
-Identify the Elbow of the Inertia Plot and Fit a K-Means Model using that value of k.
-
-
-[ ]
-kmeans5 = KMeans(n_clusters= 5, n_init= 10, random_state= 42)
-kmeans5.fit(df_scaled)
-
-Check the Number of Customers in each Cluster
-
-[ ]
-from collections import Counter
-
-Counter(kmeans5.labels_)
-Counter({3: 2343, 4: 2329, 0: 687, 2: 2336, 1: 2305})
-Create a Heat Map of the Cluster Centers and Interprete the Cluster
-
-[ ]
-cluster_centers5 = pd.DataFrame(kmeans5.cluster_centers_, columns = df_scaled.columns)
-
-plt.figure(figsize = (10, 2))
-sns.heatmap(cluster_centers5, annot = True, cmap="RdBu", fmt=".1f", linewidths= 0.5);
-
-0: Many Products in a Short Time
-1: French Customers with Few Products and High Balance
-2: German Customers with a High Balance
-3: French Customers with More Products and Low Balance
-4: Spanish Customers
-Objective 3: Cluster the Customers (Round 2)
-Our Third Objective is to Segment the Customers using K-Means Clustering using a different Subset of Fields and Compare the Model Results.
-
-Updating the Model Dataset
-We will look at the Summary Stats by Country, and Exclude the Country Field as currently the clusters are dominated by the Country Field. Then we use the updated dataset for KMeans Clustering same way as the previous steps.
-
-Double-click (or enter) to edit
-
-
-[ ]
-data_subset.head()
-
-
-[ ]
-data_geo = data_subset.copy()
-data_geo.Gender = np.where(data_geo.Gender == 'Female', 1, 0)
-data_geo.head()
-
-
-[ ]
-data_geo.groupby('Geography').mean().round()
-
-
-[ ]
-data_geo[data_geo.Geography == 'France'].Balance.round(-5).value_counts()
-
-
-[ ]
-data_geo[data_geo.Geography == 'Spain'].Balance.round(-5).value_counts()
-
-
-[ ]
-data_geo[data_geo.Geography == 'Germany'].Balance.round(-5).value_counts()
-
-Customers from French, Spain and Germany have pretty similar attributes except in Balance. German customoers have higher Balance than the other two countries.
-
-So, we will exclude the Country Field.
-
-
-[ ]
-df_scaled.head()
-
-
-[ ]
-df_scaled_no_geo = df_scaled.drop(columns = ['France', 'Germany', 'Spain'])
-df_scaled_no_geo.head()
-
-Now, fit the Clustering Model with the Updated Data
-
-[ ]
-# Import kmeans and write a loop to fit models with 2 to 15 clusters
-from sklearn.cluster import KMeans
-from sklearn.metrics import silhouette_score
-
-# Create an empty list to hold many Inertia and Silhouette Values
-inertia_values = []
-silhouette_scores = []
-
-# Creat 2-15 clusters, and add the Intertia Scores and Silhouette Scores to the Lists
-
-for k in range(2, 16):
-  kmeans = KMeans(n_clusters = k, n_init= 10, random_state = 42) #changed from auto to 10
-  kmeans.fit(df_scaled_no_geo)
-  inertia_values.append(kmeans.inertia_)
-  silhouette_scores.append(silhouette_score(df_scaled_no_geo, kmeans.labels_, metric= 'euclidean', sample_size= None))
-
-[ ]
-## Plot the Inertia Plot
-# Turn the List into a Series of Plotting
-inertia_series = pd.Series(inertia_values, index = range(2, 16))
-
-# Plot the Data
-inertia_series.plot(marker= 'o')
-plt.xlabel('Number of Clusters (k)')
-plt.ylabel('Inertia')
-plt.title('Number of Clusters vs. Inertia')
-plt.show()
-
-The Inertia drops significantly at K=4. So, we choose k=4 for our KMeans Clustering.
-
-
-[ ]
-kmeans4 = KMeans(n_clusters= 4, n_init= 10, random_state= 42)
-kmeans4.fit(df_scaled_no_geo)
-
-
-[ ]
-from collections import Counter
-
-Counter(kmeans4.labels_)
-Counter({np.int32(2): 2366,
-         np.int32(3): 2135,
-         np.int32(1): 3223,
-         np.int32(0): 2276})
-Create the Heatmap again to Find the Cluster Centers
-
-[ ]
-cluster_centers4 = pd.DataFrame(kmeans4.cluster_centers_, columns = df_scaled_no_geo.columns)
-
-plt.figure(figsize = (10, 2))
-sns.heatmap(cluster_centers4, annot = True, cmap="RdBu", fmt=".1f", linewidths= 0.5);
-
-0: Customers who don't have a Credit Card, but with a relatively high Tenure.
-1: High Balance with Few Products and Have Credit Card.
-2: Low Balance, More Products and Have Credit Card.
-3: Customers with Many Products in a very Short period of Time.
-Objective 4: Explore the Clusters and Make Recommendations
-Our Final Objective is to further Explore Our K-Means Clusters by looking at their Churn Rate and Country Breakdown, then make Recommendations for how to Cater to each Customer Segment.
-
-Let's create a DataFrame that combines the data set from the end of Objective 1, the "Exited" field, and the cluster labels.
-
-[ ]
-data_clean.head()
-
-
-[ ]
-data.Exited.head()
-
-
-[ ]
-kmeans4.labels_
-array([2, 3, 2, ..., 0, 2, 1], dtype=int32)
-Let's merge those together:
-
-
-[ ]
-data_final = pd.concat([data_clean, data.Exited, pd.Series(kmeans4.labels_, name = 'Cluster')], axis = 1)
-data_final.head()
-
-View the Exited Percent for Each Cluster
-
-[ ]
-data_final.groupby('Cluster').mean().round(2)
-
-So, cluster 1 has the highest churn rate (23%) and cluster 2 has the lowest churn rate (16%)
-
-View the Geography Breakdown for Each Cluster
-For Cluster 2 there are many French Customers and very few German Customers.
-
-Making Recommendations
-We have to make recommendations for how to Cater to each Customer Segments.
-
-These are the characteristics of the Clusters we found earlier:
-
-0: Customers who don't have a Credit Card.
-1: High Balance with Few Products and Have Credit Card.
-2: Low Balance, More Products and Have Credit Card.
-3: Customers with Many Products in a very Short period of Time.
-Recommendations:
-
-Clsuter 0: Create an Entry-level Credit Card; Also, do some research on their Demographic Information.
-
-Cluster 1: They have very high Balance, but likely to leave. So, try to keep them by offering them financial seminars or advisors or, maybe suggest investment opportunities.
-
-Cluster 2: They are less likely to leave. We can reward them (French and Spanish Customers) for staying. We can introduce reward programs to encourage them to invest in more products.
-
-Cluster 3: They have many products in a very short time. Churn rate is also relatively high. Since, they like products we may offer them products with higher tenure.
-
-Colab paid products - Cancel contracts here
+Cluster 5: Cash Advances with large Payments but Highest Credit Limit and Frugal - this group takes the most cash advances. They make large payments, but this appears to be a small group of customers. this group doesn't make a lot of purchases. It looks like the 3rd largest group of customers.
