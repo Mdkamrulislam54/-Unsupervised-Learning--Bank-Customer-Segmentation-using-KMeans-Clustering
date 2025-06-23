@@ -6,7 +6,7 @@ The problem statement is to develop a customer segmentation, i.e. to identify di
 
 ## Dataset
 
-The dataset used for this project can be found at this [link](https://www.kaggle.com/arjunbhasin2013/ccdata).
+The dataset used for this project can be found at this [link]([https://www.kaggle.com/arjunbhasin2013/ccdata](https://github.com/Mdkamrulislam54/-Unsupervised-Learning--Bank-Customer-Segmentation-using-KMeans-Clustering/blob/f89cd1c7fcd9d38bf240763df134e576c53b9ac0/Bank_Churn.csv)).
 
 ## Data Cleaning Process
 
