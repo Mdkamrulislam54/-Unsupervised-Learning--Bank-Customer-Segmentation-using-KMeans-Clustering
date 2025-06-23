@@ -6,8 +6,7 @@ The problem statement is to develop a customer segmentation, i.e. to identify di
 
 ## Dataset
 
-The dataset used for this project can be found at this [link]([https://www.kaggle.com/arjunbhasin2013/ccdata](https://github.com/Mdkamrulislam54/-Unsupervised-Learning--Bank-Customer-Segmentation-using-KMeans-Clustering/blob/f89cd1c7fcd9d38bf240763df134e576c53b9ac0/Bank_Churn.csv)).
-
+The dataset used for this project can be found at this[Dataset Link](https://github.com/Mdkamrulislam54/-Unsupervised-Learning--Bank-Customer-Segmentation-using-KMeans-Clustering/blob/cd0b018ab83c0336cac7ccc4877d749a95c4ad07/Bank_Churn.csv)
 ## Data Cleaning Process
 
 - The dataset has 1 missing value for CREDIT_LIMIT and 313 missing values for MINIMUM_PAYMENTS.
